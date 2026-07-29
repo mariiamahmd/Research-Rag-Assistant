@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from rag.spellcheck import normalize_question
 from preprocessing.processor import process_pdf
 from rag.vectorstore import collection_exists
 from rag.embed import embed_documents
@@ -49,6 +49,7 @@ def add_pdf(pdf_path):
 
 
 def ask(question, filenames=None, compare=False):
+    question = normalize_question(question)
 
     # Check if any papers are loaded
     if not collection_exists():
@@ -65,7 +66,7 @@ def ask(question, filenames=None, compare=False):
 
     
   # Rerank to top 5
-    best = rerank(question, docs, top_k=8)
+    best = rerank(question, docs, top_k=5)
 
     if not best:
       return "I couldn't find the answer in the uploaded papers.", []

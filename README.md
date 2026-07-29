@@ -24,7 +24,7 @@
 
 # 📖 Project Overview
 
-A Retrieval-Augmented Generation (RAG) application that enables users to upload research papers in PDF format and ask natural language questions about their content. The system retrieves the most relevant passages using semantic search and reranking, then generates accurate answers using the Mistral Large Language Model.
+Research RAG Assistant is a Retrieval-Augmented Generation (RAG) application that enables users to upload one or multiple research papers in PDF format, ask natural-language questions, compare selected papers, and receive grounded answers generated only from the uploaded documents. The system combines semantic retrieval, reranking, and a Large Language Model (Mistral) to provide accurate, transparent responses with supporting source passages.
 
 ---
 ## ✨ Features
@@ -35,6 +35,7 @@ A Retrieval-Augmented Generation (RAG) application that enables users to upload 
 - Semantic search using **BAAI/bge-small-en-v1.5** embeddings.
 - Fast vector search with **Qdrant Cloud**.
 - Improved retrieval using the **CrossEncoder (cross-encoder/ms-marco-MiniLM-L-6-v2)** reranker.
+- Automatic query normalization and typo correction for more robust retrieval.
 - Generates answers using the **Mistral LLM**.
 - Rejects unrelated questions using reranker threshold filtering.
 - Displays retrieved source passages and relevance scores.
@@ -216,7 +217,7 @@ The assistant summarizes the similarities and differences using information retr
 
 ---
 
-## Upload Papers & Answered Question
+## Question Answering
 
 <p align="center">
     <img src="images/papers_section.png" width="18%">
@@ -233,7 +234,7 @@ The assistant summarizes the similarities and differences using information retr
 
 ---
 
-## Compare 2 papers
+## Paper Comparison
 
 
 <p align="center">
@@ -258,6 +259,7 @@ The assistant summarizes the similarities and differences using information retr
 - Generates answers grounded only in the uploaded research papers.
 - Supports searching across one or multiple selected papers.
 - Improves retrieval quality using semantic search followed by reranking.
+- Automatic query normalization improves retrieval robustness for misspelled queries.
 - Rejects questions when no relevant context is available.
 - Displays retrieved source passages and reranker scores for transparency.
 - Supports comparing two research papers using retrieved evidence from both.
