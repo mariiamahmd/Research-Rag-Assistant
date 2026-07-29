@@ -10,7 +10,7 @@ st.set_page_config(
 )
 
 st.title("📚 Research RAG Assistant")
-
+st.checkbox("🔍 Compare Selected Papers")
 # -------------------------
 # Configuration
 # -------------------------
@@ -77,19 +77,30 @@ with st.sidebar:
 
         if checked:
             selected_papers.append(paper.name)
+    
 
     else:
       st.info("No papers uploaded.")
 
+    compare_mode = st.checkbox(
+    "🔍 Compare Selected Papers",
+    value=False,
+)
+
+    if compare_mode and len(selected_papers) != 2:
+     st.warning("Select exactly two papers to compare.")
+
     st.divider()
 
     if st.button("🗑️ Delete All", use_container_width=True):
-        clear_collection()
+
+        clear_collection()          # Delete vectors from Qdrant
 
         for pdf in UPLOAD_FOLDER.glob("*.pdf"):
             pdf.unlink()
 
         st.session_state.clear()
+        st.success("All papers deleted.")
         st.rerun()
 
 # =========================
@@ -170,13 +181,20 @@ if question:
                 st.warning("Please select at least one paper.")
                 st.stop()
 
-            with st.spinner("Searching papers..."):
+            spinner_text = (
+    "Comparing papers..."
+    if compare_mode
+    else "Searching papers..."
+)
 
+            with st.spinner(spinner_text):
+
+   
                 answer, sources = ask(
-                    question,
-                    filenames=selected_papers
-                )
-
+    question,
+    filenames=selected_papers,
+    compare=compare_mode
+)
             valid_sources = sources
 
         st.markdown(answer)

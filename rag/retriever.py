@@ -1,10 +1,11 @@
 from rag.embed import embed_query
 from rag.vectorstore import search
 
+  
 
 def retrieve(question, filenames=None, top_k=5):
     """Retrieve relevant documents from selected papers"""
-    
+    # Convert question to embedding
     query_embedding = embed_query(question)
     
     if query_embedding is None or len(query_embedding) == 0:
@@ -16,12 +17,12 @@ def retrieve(question, filenames=None, top_k=5):
         limit=top_k,
         filenames=filenames  # Can be None (search all) or list of filenames
     )
-
+ # Format results into documents
     documents = []
 
     for result in results:
         doc = {
-            "score": result.score,
+            "score": result.score, # Similarity score (higher = better)
             "paper": result.payload.get("paper", "Unknown"),
             "filename": result.payload.get("filename", "Unknown"),
             "chunk_id": result.payload.get("chunk_id", 0),

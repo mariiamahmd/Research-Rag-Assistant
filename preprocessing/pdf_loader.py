@@ -9,7 +9,7 @@ def extract_text_from_pdf(pdf_path):
     text = ""
 
     for page in document:
-        text += page.get_text()
+        text += page.get_text() # extract raw text from each page
 
     document.close()
 

@@ -12,7 +12,7 @@ def chunk_document(title, filename, text):
     split_text = splitter.split_text(text)
 
     chunks = []
-
+# store each chunk
     for i, chunk in enumerate(split_text):
         chunks.append({
             "paper": title,

@@ -14,9 +14,10 @@ import streamlit as st
 
 load_dotenv()
 
-
+####### Connecting to qdrant DB ##############
 QDRANT_URL = st.secrets["QDRANT_URL"]
 QDRANT_API_KEY = st.secrets["QDRANT_API_KEY"]
+
 
 print("URL:", repr(QDRANT_URL))
 print("API:", QDRANT_API_KEY[:8] if QDRANT_API_KEY else None)
@@ -26,11 +27,14 @@ client = QdrantClient(
     timeout=120,
 )
 
+#================================================================#
 
 COLLECTION_NAME = "research_papers"
 
+## to start fresh whenever i click on delete all ##
 def clear_collection():
     if collection_exists():
+
         client.delete(
             collection_name=COLLECTION_NAME,
             points_selector=Filter()
@@ -59,22 +63,23 @@ def get_max_chunk_id():
         return 0
 
 
+
 def create_collection(vector_size):
     try:
         client.get_collection(COLLECTION_NAME)
         print("Collection already exists.")
         return
     except Exception:
-        pass
+        pass # Collection doesn't exist, create it
 
     client.create_collection(
         collection_name=COLLECTION_NAME,
         vectors_config=VectorParams(
-            size=vector_size,
-            distance=Distance.COSINE,
+            size=vector_size,  # 384 (dimension of embeddings)
+            distance=Distance.COSINE, # Cosine similarity for comparison
         ),
     )
-
+# Create an index on "filename" for fast filtering
     client.create_payload_index(
         collection_name=COLLECTION_NAME,
         field_name="filename",
@@ -83,7 +88,7 @@ def create_collection(vector_size):
 
     print("Collection created.")
 
-
+# Takes chunks and embeddings, packages them into Qdrant points, and uploads them in batches.
 def upload_chunks(chunks, embeddings):
     batch_size = 25
     next_id = get_max_chunk_id()
@@ -97,7 +102,7 @@ def upload_chunks(chunks, embeddings):
 
             if hasattr(embedding, "tolist"):
                 embedding = embedding.tolist()
-
+# data is stored [id + vector embedding +text]
             points.append(
                 PointStruct(
                     id=next_id,
@@ -131,7 +136,7 @@ def search(query_vector, limit=5, filenames=None):
         query_vector = query_vector.tolist()
 
     search_filter = None
-
+ # If user wants to search only specific papers
     if filenames:
         search_filter = models.Filter(
             should=[
@@ -145,8 +150,8 @@ def search(query_vector, limit=5, filenames=None):
 
     return client.query_points(
         collection_name=COLLECTION_NAME,
-        query=query_vector,
-        limit=limit,
+        query=query_vector, # compare question with the chunks
+        limit=limit, # return top 5
         query_filter=search_filter
     ).points
 
@@ -155,6 +160,7 @@ def delete_collection():
     client.delete_collection(COLLECTION_NAME)
 
 
+# Checks if a paper has already been uploaded (prevents duplicates).
 def paper_exists(filename):
     if not collection_exists():
         return False
@@ -169,7 +175,7 @@ def paper_exists(filename):
                 )
             ]
         ),
-        limit=1,
+        limit=1,  # Just check if at least one exists
     )
 
     return len(records) > 0
