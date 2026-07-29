@@ -179,3 +179,34 @@ def paper_exists(filename):
     )
 
     return len(records) > 0
+
+
+
+def get_uploaded_papers():
+    """Return unique filenames stored in Qdrant."""
+
+    if not collection_exists():
+        return []
+
+    papers = set()
+
+    offset = None
+
+    while True:
+        records, offset = client.scroll(
+            collection_name=COLLECTION_NAME,
+            limit=100,
+            offset=offset,
+            with_payload=True,
+            with_vectors=False,
+        )
+
+        for record in records:
+            filename = record.payload.get("filename")
+            if filename:
+                papers.add(filename)
+
+        if offset is None:
+            break
+
+    return sorted(list(papers))

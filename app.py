@@ -1,6 +1,9 @@
 from pathlib import Path
 import streamlit as st
-from rag.vectorstore import clear_collection
+from rag.vectorstore import (
+    clear_collection,
+    get_uploaded_papers,
+)
 from rag.pipeline import add_pdf, ask
 
 st.set_page_config(
@@ -61,22 +64,23 @@ with st.sidebar:
 
     st.divider()
 
-    papers = sorted(UPLOAD_FOLDER.glob("*.pdf"))
+    papers = get_uploaded_papers()
 
     selected_papers = []
 
     if papers:
       st.write("### 📄 Search In")
-
+        
       for paper in papers:
         checked = st.checkbox(
-            paper.name,
-            value=True,
-            key=f"paper_{paper.name}"
-        )
+        paper,
+        value=True,
+        key=f"paper_{paper}"
+    )
 
         if checked:
-            selected_papers.append(paper.name)
+          selected_papers.append(paper)
+    
     
 
     else:
@@ -171,10 +175,10 @@ if question:
 
         else:
 
-            papers = sorted(UPLOAD_FOLDER.glob("*.pdf"))
+            papers = get_uploaded_papers()
 
-            if not papers:
-                st.warning("Please upload at least one paper first.")
+            if not papers: 
+                st.warning("No papers are indexed.")
                 st.stop()
 
             if not selected_papers:
