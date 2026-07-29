@@ -24,146 +24,203 @@
 
 # 📖 Project Overview
 
-RAG Research Assistant is a web application that allows users to upload one or multiple PDF research papers. in PDF format and ask questions about their content. The system retrieves the most relevant information from the uploaded documents and uses a Large Language Model (LLM) to generate accurate, context-based answers.
+A Retrieval-Augmented Generation (RAG) application that enables users to upload research papers in PDF format and ask natural language questions about their content. The system retrieves the most relevant passages using semantic search and reranking, then generates accurate answers using the Mistral Large Language Model.
 
 ---
+## ✨ Features
 
-# ✨ Features
-
-- Upload one or multiple PDF research papers.
-- Select which uploaded papers to search using checkboxes.
+- Upload one or multiple research papers in PDF format.
+- Search across all uploaded papers or only selected papers.
+- Compare two selected research papers side by side.
 - Semantic search using **BAAI/bge-small-en-v1.5** embeddings.
-- Vector storage with Qdrant Cloud.
-- Improved retrieval using the CrossEncoder (cross-encoder/ms-marco-MiniLM-L-12-v2) reranker.
-- Context-aware answer generation using the Mistral LLM.
-- Prevents answering unrelated questions using reranker threshold filtering.
-- Displays retrieved source passages for transparent answers.
-- Simple and interactive Streamlit interface.
+- Fast vector search with **Qdrant Cloud**.
+- Improved retrieval using the **CrossEncoder (cross-encoder/ms-marco-MiniLM-L-6-v2)** reranker.
+- Generates answers using the **Mistral LLM**.
+- Rejects unrelated questions using reranker threshold filtering.
+- Displays retrieved source passages and relevance scores.
+- Interactive web interface built with **Streamlit**.
+- Ready for deployment on **Streamlit Cloud**.
 
 ---
 
-# 🛠️ Technologies Used
+## 🛠️ Technologies Used
 
 - Python
 - Streamlit
 - PyMuPDF
 - LangChain Text Splitters
 - Sentence Transformers
+- BAAI/bge-small-en-v1.5
+- CrossEncoder (ms-marco-MiniLM-L-6-v2)
 - Qdrant Cloud
-- Mistral LLM
----
-
-# ⚙️ Installation
-
-1. Clone the repository.
-2. Create and activate a virtual environment.
-3. Install the required packages:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Add your API keys to the `.env` file.
-5. Run the application:
-   ```bash
-   streamlit run app.py
-   ```
+- Mistral AI
+- python-dotenv
 
 ---
+## 🚀 Quick Start
 
-# 🔑 Environment Variables
+### Try it online
 
-Create a `.env` file in the project root by copying `.env.example`:
+The application is deployed on **Streamlit Cloud**.
+
+👉 **Live Demo:**  
+
+https://research-rag-assistant-wzs8dghxdaigbscr2fexnb.streamlit.app/
+
+## Run locally
+
+### 1. Clone the repository
 
 ```bash
-cp .env.example .env
+git clone https://github.com/mariiamahmd/Research-Rag-Assistant.git
+cd Research-Rag-Assistant
 ```
 
-Then update the values in `.env` with your own configuration:
+### 2. Create a virtual environment
+
+Windows
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+Linux / macOS
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## 🔑 Environment Variables
+
+Create a `.env` file in the project root.
 
 ```env
-QDRANT_URL=http://localhost:6333
+QDRANT_URL=https://your-cluster-url.cloud.qdrant.io
+QDRANT_API_KEY=your_qdrant_api_key
 MISTRAL_API_KEY=your_mistral_api_key
 ```
 
-> **Note:** If you're using Qdrant Cloud instead of a local Qdrant instance, replace `QDRANT_URL` with your Qdrant Cloud endpoint and set your `QDRANT_API_KEY`.
+### Streamlit Cloud Deployment
 
----
+When deploying to Streamlit Cloud, add the same variables under:
 
-# 🚀 Usage
+**App → Settings → Secrets**
 
-1. Launch the application.
-2. Upload one or more research papers in PDF format.
-3. Wait for the papers to be processed and indexed.
-4. Select the paper(s) you want to search.
-5. Enter a question about the selected paper(s).
-6. View the generated answer and supporting source passages.
-
----
-## 🏗️ System Architecture
-
-```text
-PDF Upload
-     │
-     ▼
-Text Extraction (PyMuPDF)
-     │
-     ▼
-Text Chunking
-     │
-     ▼
-BGE Embeddings
-     │
-     ▼
-Qdrant Cloud
-     │
-     ▼
-Semantic Retrieval
-     │
-     ▼
-CrossEncoder Reranker
-     │
-     ▼
-Threshold Filtering
-     │
-     ▼
-Mistral LLM
-     │
-     ▼
-Generated Answer + Sources
+```toml
+QDRANT_URL="https://your-cluster-url.cloud.qdrant.io"
+QDRANT_API_KEY="your_qdrant_api_key"
+MISTRAL_API_KEY="your_mistral_api_key"
 ```
 
 ---
 
-# 🔄 Example Workflow
+## ▶️ Running the Application
 
-1. Upload one or more PDF research papers.
-2. The application extracts and cleans the text.
-3. The text is split into overlapping chunks.
-4. Each chunk is converted into a BGE embedding.
-5. Embeddings are stored in Qdrant Cloud.
-6. When a question is asked:
-   - The question is embedded.
-   - Qdrant retrieves the most relevant chunks.
-   - A CrossEncoder reranks the retrieved chunks.
-   - A relevance threshold filters unrelated results.
-   - The Mistral LLM generates an answer using only the retrieved context.
-7. The answer and supporting source passages are displayed.
+```bash
+streamlit run app.py
+```
 
 ---
+
+## 🚀 Usage
+
+1. Upload one or more research papers.
+2. Wait until they are processed and indexed.
+3. Select the paper(s) you want to search.
+4. Ask a question.
+5. View the generated answer together with the retrieved source passages.
+
+### Paper Comparison
+
+Enable **Compare Selected Papers**, select exactly **two papers**, and ask a comparison question such as:
+
+> Compare the retrieval methods used in these papers.
+
+The assistant summarizes the similarities and differences using information retrieved from both papers.
+
+---
+
+# 🏗️ System Architecture
+
+```text
+                    PDF Upload
+                         │
+                         ▼
+           Text Extraction (PyMuPDF)
+                         │
+                         ▼
+      Text Chunking (LangChain Splitter)
+                         │
+                         ▼
+        BGE Embedding Generation
+                         │
+                         ▼
+               Qdrant Cloud Storage
+                         │
+                         ▼
+            Semantic Vector Retrieval
+                         │
+                         ▼
+           CrossEncoder Reranking
+                         │
+                         ▼
+            Threshold Filtering
+                         │
+                         ▼
+             Mistral LLM Generation
+                         │
+                         ▼
+        Final Answer + Source Passages
+```
+
+---
+
+## 🔄 Workflow
+
+### Document Processing
+
+1. Upload a PDF.
+2. Extract text using **PyMuPDF**.
+3. Split the text into overlapping chunks.
+4. Generate embeddings for each chunk.
+5. Store embeddings and metadata in **Qdrant Cloud**.
+
+### Question Answering
+
+1. Embed the user's question.
+2. Retrieve the most similar chunks from Qdrant.
+3. Rerank retrieved chunks using the CrossEncoder.
+4. Filter irrelevant results using a relevance threshold.
+5. Generate an answer using only the retrieved context.
+6. Display the answer together with the supporting source passages.
+
+---
+
 # 📸 Demo
 
 ## Application Overview
 
 <p align="center">
-  <img src="images/whole_app.png" width="950">
+    <img src="images/home.png" width="950">
 </p>
 
 ---
 
-## Upload Papers & Select Search Scope
+## Upload Papers & Answered Question
 
 <p align="center">
-  <img src="images/papers_section.png" width="15%" height="90%">
-  <img src="images/question_section.png" width="60%" >
+    <img src="images/papers_section.png" width="18%">
+    <img src="images/NormalQuestion.png" width="68%">
 </p>
 
 ---
@@ -171,7 +228,18 @@ Generated Answer + Sources
 ## Generated Answer with Sources
 
 <p align="center">
-  <img src="images/sources.png" width="700">
+    <img src="images/sources (2).png" width="750">
+</p>
+
+---
+
+## Compare 2 papers
+
+
+<p align="center">
+    <img src="images/compare1.png" width="60%">
+    <Br>
+    <img src="images/compare2.png" width="60%">
 </p>
 
 ---
@@ -179,25 +247,38 @@ Generated Answer + Sources
 ## Handling Irrelevant Questions
 
 <p align="center">
-  <img src="images/irrelevant_question.png" width="700">
+    <img src="images/irrelevant_question.png" width="70%">
+    <img src="images/Unknown question.png" width="70%">
 </p>
 
 ---
 
 # 📈 Results
 
-- Answers are generated only from the selected research paper(s).
-- Semantic retrieval combined with reranking improves answer quality.
-- Irrelevant questions are rejected when no relevant context is found.
-- Retrieved source passages are displayed for transparency.
-
----
+- Generates answers grounded only in the uploaded research papers.
+- Supports searching across one or multiple selected papers.
+- Improves retrieval quality using semantic search followed by reranking.
+- Rejects questions when no relevant context is available.
+- Displays retrieved source passages and reranker scores for transparency.
+- Supports comparing two research papers using retrieved evidence from both.
 
 # 🔮 Future Improvements
 
-* Support additional document formats (DOCX, TXT, etc.).
-* Add conversation history and citations.
-* Support multimodal documents containing images and tables.
+- Support DOCX, TXT, and Markdown documents.
+- Support image-based PDFs using OCR.
+- Export answers and comparisons as PDF.
+ 
+---
+
+## 👩‍💻 Author
+
+Developed as a Research RAG Assistant project using:
+
+- Streamlit
+- Qdrant Cloud
+- Sentence Transformers
+- Mistral AI
+- LangChain Text Splitters
 
 ---
 
